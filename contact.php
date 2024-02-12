@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail_user->Host       = "smtp.zoho.com";
     $mail_user->SMTPAuth   = true;
     $mail_user->Username   = "contacto@zrcarlos20.xyz";
-    $mail_user->Password   = ""; // Aquí debes colocar tu contraseña de Zoho
+    $mail_user->Password   = "ItS.qg9f"; // Aquí debes colocar tu contraseña de Zoho
     $mail_user->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
     $mail_user->Port       = 587;
 
