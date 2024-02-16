@@ -1,88 +1,56 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
+// Incluimos los archivos de PHPMailer utilizando rutas relativas
 require 'PHPMailer/src/Exception.php';
 require 'PHPMailer/src/PHPMailer.php';
 require 'PHPMailer/src/SMTP.php';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
+// Verificamos si se han enviado los datos del formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validar los campos del formulario
-    if (empty($_POST['name']) || empty($_POST['phone']) || empty($_POST['message']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-        http_response_code(500);
-        exit();
-    }
+    // Capturamos los datos del formulario
+    $nombre = $_POST['nombre'];
+    $email = $_POST['email'];
+    $mensaje = $_POST['mensaje'];
 
-    // Obtener datos del formulario y sanearlos
-    $name = strip_tags(htmlspecialchars($_POST['name']));
-    $email = strip_tags(htmlspecialchars($_POST['email']));
-    $phone = strip_tags(htmlspecialchars($_POST['phone']));
-    $message = strip_tags(htmlspecialchars($_POST['message']));
+    // Creamos una instancia de PHPMailer
+    $mail = new PHPMailer(true);
 
-    // Configuración del destinatario (tu correo de Zoho)
-    $to_zoho = "contacto@zrcarlos20.xyz"; // Cambia este correo al de tu cuenta de Zoho
-    $subject_zoho = "Mensaje de contacto: $name";
-    $body_zoho = "Has recibido un nuevo mensaje desde el formulario de contacto de tu sitio web.\n\n" . "Detalles:\n\nNombre: $name\n\nEmail: $email\n\nTeléfono: $phone\n\nMensaje: $message";
-
-    // Configuración de PHPMailer para Zoho
-    $mail_zoho = new PHPMailer(true);
-    $mail_zoho->SMTPDebug = SMTP::DEBUG_SERVER; // Puedes usar SMTP::DEBUG_OFF para desactivar la depuración
-    $mail_zoho->isSMTP();
-    $mail_zoho->Host       = "smtp.zoho.com";
-    $mail_zoho->SMTPAuth   = true;
-    $mail_zoho->Username   = "contacto@zrcarlos20.xyz";
-    $mail_zoho->Password   = "ItS.qg9f"; // Aquí debes colocar tu contraseña de Zoho
-    $mail_zoho->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail_zoho->Port       = 587;
-
-    // Configurar el remitente y destinatario para Zoho
-    $mail_zoho->setFrom("contacto@zrcarlos20.xyz", $name);
-    $mail_zoho->addAddress($to_zoho);
-
-    // Configurar el contenido del mensaje para Zoho
-    $mail_zoho->isHTML(true);
-    $mail_zoho->Subject = $subject_zoho;
-    $mail_zoho->Body    = $body_zoho;
-
-    // Intentar enviar el mensaje a Zoho
     try {
-        $mail_zoho->send();
+        // Configuramos el servidor SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.zoho.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'contacto@zrcarlos20.xyz';  // Reemplaza con tu nombre de usuario SMTP de Zoho
+        $mail->Password = '06082003Jc#';  // Reemplaza con tu contraseña SMTP de Zoho
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Configuramos el remitente y el destinatario
+        $mail->setFrom('contacto@zrcarlos20.xyz', 'ZR les desea buen dia');
+        $mail->addAddress($email); // Usamos la dirección de correo electrónico proporcionada en el formulario
+
+        // Asunto y cuerpo del mensaje
+        $mail->Subject = 'FormularioS ZR';
+        $mail->Body    = "Nombre: $nombre\r\nEmail: $email\r\nMensaje: $mensaje";
+
+        // Habilitamos la depuración para obtener más información
+        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+
+        // Intentamos enviar el correo
+        if ($mail->send()) {
+            // Redireccionamos al usuario a la página de confirmación
+            header("Location: confirmacion.html");
+            exit; // Aseguramos que el código posterior no se ejecute después de la redirección
+        } else {
+            echo "Error al enviar el correo: " . $mail->ErrorInfo;
+        }
     } catch (Exception $e) {
-        http_response_code(500);
-        exit();
+        echo "Error al enviar el correo: " . $e->getMessage();
     }
-
-    // Enviar correo a la dirección ingresada por el usuario
-    $subject_user = "Gracias por ponerte en contacto, $name";
-    $body_user = "¡Gracias por ponerte en contacto con nosotros, $name!\n\nHemos recibido tu mensaje y nos pondremos en contacto contigo pronto.\n\nDetalles:\n\nNombre: $name\n\nEmail: $email\n\nTeléfono: $phone\n\nMensaje: $message";
-
-    // Configuración de PHPMailer para el usuario
-    $mail_user = new PHPMailer(true);
-    $mail_user->SMTPDebug = SMTP::DEBUG_SERVER;
-    $mail_user->isSMTP();
-    $mail_user->Host       = "smtp.zoho.com";
-    $mail_user->SMTPAuth   = true;
-    $mail_user->Username   = "contacto@zrcarlos20.xyz";
-    $mail_user->Password   = "ItS.qg9f"; // Aquí debes colocar tu contraseña de Zoho
-    $mail_user->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail_user->Port       = 587;
-
-    // Configurar el remitente y destinatario para el usuario
-    $mail_user->setFrom("contacto@zrcarlos20.xyz", $name);
-    $mail_user->addAddress($email);
-
-    // Configurar el contenido del mensaje para el usuario
-    $mail_user->isHTML(true);
-    $mail_user->Subject = $subject_user;
-    $mail_user->Body    = $body_user;
-
-    // Intentar enviar el mensaje al usuario
-    try {
-        $mail_user->send();
-    } catch (Exception $e) {
-        http_response_code(500);
-        exit();
-    }
+} else {
+    // Si no se han enviado los datos por POST, redirigimos o mostramos un mensaje de error
+    echo "Error: Los datos del formulario no fueron enviados correctamente.";
 }
 ?>

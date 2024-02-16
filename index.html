@@ -713,23 +713,23 @@
          </div>
          <div class="row">
             <div class="col-md-8 offset-md-2">
-               <form id="contactForm" enctype="multipart/form-data" action="https://zrcarlos20.xyz/plantilla-html/contact.php" class="contact_form" method="POST">
-                  <div class="row">
-                     <div class="col-md-12 ">
-                        <input class="contact_control" placeholder=" name" type="text" name="name">
-                     </div>
-                     <div class="col-md-12">
-                        <input class="contact_control" placeholder="Email" type="text" name="email">
-                     </div>
-                     <div class="col-md-12">
-                        <input class="contact_control" placeholder="Phone" type="text" name="phone">
-                     </div>
-                     <div class="col-md-12">
-                        <textarea class="textarea" placeholder="Message" type="text" name="message">Message</textarea>
-                     </div>
-                     <div class="col-md-12">
-                        <button id="submitButton" type="button" class="send_btn">Send</button>
-                     </div>
+               <form method='POST' action='contact.php'>
+                  <div class="form-group">
+                     <label for="nombre">Nombre</label>
+                     <input type="text" class="form-control" name='nombre' id="nombre" placeholder="nombre...">
+                  </div>
+                  <div class="form-group">
+                     <label for="email">Email</label>
+                     <input type="email" class="form-control" name='email' id="email" placeholder="email...">
+                  </div>
+                  <div class="form-group">
+                     <label for="exampleTextarea">Mensaje</label>
+                     <textarea class="form-control" name='mensaje' id="mensaje" rows="3"></textarea>
+                  </div>
+                  <div class="form-group">
+                     <input type="checkbox" required> Acepto la política de privacidad.
+                  </div>
+                  <button class="btn btn-primary" type="submit">Enviar</button>
                </form>
             </div>
          </div>
@@ -829,7 +829,7 @@
           });
     
           try {
-            const response = await fetch("https://zrcarlos20.xyz/plantilla-html/contact.php", {
+            const response = await fetch("contact.php", {
               method: "POST",
               body: new FormData(document.getElementById("contactForm"))
             });
